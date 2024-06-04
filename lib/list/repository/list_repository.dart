@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:github/github.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upstack_assessment/constants/api_constant.dart';
 import 'package:upstack_assessment/list/model/list_model.dart';
 import 'package:http/http.dart' as http;
@@ -5,34 +9,49 @@ import 'package:http/http.dart' as http;
 class ListRepository {
   final http.Client httpClient = http.Client();
 
-  Future<List<ListModel>> fetchLists({required int page, required int limit}) async {
-    final response = await httpClient.get(
-      headers: {'Authorization': 'Bearer ${ApiConstant.AUTH_TOKEN}'},
-      Uri.https(
-        ApiConstant.BASE_URL,
+  Future<List<ListModel>> fetchLists({required int page}) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? email = prefs.getString('email');
+    final String? password = prefs.getString('password');
+    try {
+      final response = await GitHub(
+        auth: Authentication.basic(
+          '${email}',
+          '${password}',
+        ),
+      ).getJSON(
         ApiConstant.REPO_LIST,
-        {'page': '$page', 'per_page': '$limit'},
-      ),
-    );
-    if (response.statusCode == 200) {
-      List<ListModel> listModel = listModelFromJson(response.body);
-      return listModel;
+        params: {
+          'per_page': '10',
+          'page': '$page',
+        },
+      );
+      return listModelFromJson(jsonEncode(response));
+    } catch (e) {
+      return throw Exception('error fetching lists: $e');
     }
-    return throw Exception('error fetching lists');
   }
 
-  Future<List<ListModel>> fetchAllLists() async {
-    final response = await httpClient.get(
-      headers: {'Authorization': 'Bearer ${ApiConstant.AUTH_TOKEN}'},
-      Uri.https(
-        ApiConstant.BASE_URL,
-        ApiConstant.REPO_LIST,
-      ),
-    );
-    if (response.statusCode == 200) {
-      List<ListModel> listModel = listModelFromJson(response.body);
-      return listModel;
+  Future<List<ListModel>> fetchListByName({
+    required int page,
+    required String name,
+  }) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? email = prefs.getString('email');
+    final String? password = prefs.getString('password');
+    try {
+      final response = await GitHub(
+        auth: Authentication.basic(
+          '${email}',
+          '${password}',
+        ),
+      ).getJSON(
+        '${ApiConstant.SEARCH_REPO_LIST}?q=$name+in%3Aname+org%3Aflutter&per_page=10&page=$page',
+      );
+      log('search response >>> ${response['items']}');
+      return listModelFromJson(jsonEncode(response['items']));
+    } catch (e) {
+      return throw Exception('error fetching lists: $e');
     }
-    return throw Exception('error fetching lists');
   }
 }

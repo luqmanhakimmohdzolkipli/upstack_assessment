@@ -14,16 +14,12 @@ class ListModel {
     final String? fullName;
     final bool? private;
     final String? description;
-    final int? size;
     final int? stargazersCount;
     final int? watchersCount;
     final String? language;
     final int? forksCount;
-    final bool? allowForking;
     final List<String>? topics;
-    final String? visibility;
     final int? forks;
-    final int? openIssues;
     final int? watchers;
 
     ListModel({
@@ -32,16 +28,12 @@ class ListModel {
         this.fullName,
         this.private,
         this.description,
-        this.size,
         this.stargazersCount,
         this.watchersCount,
         this.language,
         this.forksCount,
-        this.allowForking,
         this.topics,
-        this.visibility,
         this.forks,
-        this.openIssues,
         this.watchers,
     });
 
@@ -51,16 +43,12 @@ class ListModel {
         fullName: json["full_name"],
         private: json["private"],
         description: json["description"],
-        size: json["size"],
         stargazersCount: json["stargazers_count"],
         watchersCount: json["watchers_count"],
         language: json["language"],
         forksCount: json["forks_count"],
-        allowForking: json["allow_forking"],
         topics: json["topics"] == null ? [] : List<String>.from(json["topics"]!.map((x) => x)),
-        visibility: json["visibility"],
         forks: json["forks"],
-        openIssues: json["open_issues"],
         watchers: json["watchers"],
     );
 
@@ -70,16 +58,12 @@ class ListModel {
         "full_name": fullName,
         "private": private,
         "description": description,
-        "size": size,
         "stargazers_count": stargazersCount,
         "watchers_count": watchersCount,
         "language": language,
         "forks_count": forksCount,
-        "allow_forking": allowForking,
         "topics": topics == null ? [] : List<dynamic>.from(topics!.map((x) => x)),
-        "visibility": visibility,
         "forks": forks,
-        "open_issues": openIssues,
         "watchers": watchers,
     };
 }

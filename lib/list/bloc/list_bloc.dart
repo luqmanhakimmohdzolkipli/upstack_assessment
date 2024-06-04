@@ -10,24 +10,26 @@ part 'list_event.dart';
 
 part 'list_state.dart';
 
-const _listLimit = 10;
-
 class ListBloc extends Bloc<ListEvent, ListState> {
-  ListBloc() : super(ListState()) {
+  ListBloc({required this.listRepository}) : super(ListState()) {
     on<ListFetched>(_onListFetched);
+    on<SearchListByName>(_onListSearched);
   }
 
   int page = 1;
   List<ListModel> listFetched = [];
-  ListRepository listRepository = ListRepository();
+  List<ListModel> listSearched = [];
+  final ListRepository listRepository;
 
   Future<void> _onListFetched(
     ListFetched event,
     Emitter<ListState> emit,
   ) async {
+    emit(state.copyWith(isSearching: false));
     try {
-      if (listFetched.isEmpty) {
-        listFetched = await listRepository.fetchLists(page: page, limit: _listLimit);
+      if (listFetched.isEmpty && page == 1) {
+        emit(state.copyWith(status: ListStatus.initial));
+        listFetched = await listRepository.fetchLists(page: page);
         return emit(
           state.copyWith(
             status: ListStatus.success,
@@ -35,16 +37,56 @@ class ListBloc extends Bloc<ListEvent, ListState> {
           ),
         );
       }
-      listFetched = await listRepository.fetchLists(page: page, limit: _listLimit);
+      listFetched = await listRepository.fetchLists(page: page);
       if (listFetched.isEmpty) {
         return emit(state.copyWith(status: ListStatus.success));
+      } else {
+        return emit(
+          state.copyWith(
+            status: ListStatus.success,
+            lists: List.of(state.lists)..addAll(listFetched),
+          ),
+        );
       }
-      return emit(
-        state.copyWith(
-          status: ListStatus.success,
-          lists: List.of(state.lists)..addAll(listFetched),
-        ),
+    } catch (e) {
+      log('error >> $e');
+      emit(state.copyWith(status: ListStatus.failure));
+    }
+  }
+
+  Future<void> _onListSearched(
+    SearchListByName event,
+    Emitter<ListState> emit,
+  ) async {
+    emit(state.copyWith(isSearching: true));
+    try {
+      if (listSearched.isEmpty && page == 1) {
+        emit(state.copyWith(status: ListStatus.initial));
+        listSearched = await listRepository.fetchListByName(
+          page: page,
+          name: event.name,
+        );
+        return emit(
+          state.copyWith(
+            status: ListStatus.success,
+            lists: listSearched,
+          ),
+        );
+      }
+      listSearched = await listRepository.fetchListByName(
+        page: page,
+        name: event.name,
       );
+      if (listSearched.isEmpty) {
+        return emit(state.copyWith(status: ListStatus.success));
+      } else {
+        return emit(
+          state.copyWith(
+            status: ListStatus.success,
+            lists: listSearched,
+          ),
+        );
+      }
     } catch (e) {
       log('error >> $e');
       emit(state.copyWith(status: ListStatus.failure));

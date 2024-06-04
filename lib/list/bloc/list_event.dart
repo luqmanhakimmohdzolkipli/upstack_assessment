@@ -6,3 +6,12 @@ class ListEvent extends Equatable {
 }
 
 class ListFetched extends ListEvent {}
+
+class SearchListByName extends ListEvent {
+  SearchListByName({required this.name});
+
+  final String name;
+
+  @override
+  List<Object> get props => [name];
+}
