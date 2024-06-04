@@ -36,6 +36,9 @@ class ListBloc extends Bloc<ListEvent, ListState> {
         );
       }
       listFetched = await listRepository.fetchLists(page: page, limit: _listLimit);
+      if (listFetched.isEmpty) {
+        return emit(state.copyWith(status: ListStatus.success));
+      }
       return emit(
         state.copyWith(
           status: ListStatus.success,
