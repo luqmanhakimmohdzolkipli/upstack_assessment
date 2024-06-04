@@ -11,13 +11,11 @@ class ListRepository {
 
   Future<List<ListModel>> fetchLists({required int page}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? email = prefs.getString('email');
-    final String? password = prefs.getString('password');
+    final String? token = prefs.getString('token');
     try {
       final response = await GitHub(
-        auth: Authentication.basic(
-          '${email}',
-          '${password}',
+        auth: Authentication.withToken(
+          '${token}',
         ),
       ).getJSON(
         ApiConstant.REPO_LIST,
@@ -37,13 +35,11 @@ class ListRepository {
     required String name,
   }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? email = prefs.getString('email');
-    final String? password = prefs.getString('password');
+    final String? token = prefs.getString('token');
     try {
       final response = await GitHub(
-        auth: Authentication.basic(
-          '${email}',
-          '${password}',
+        auth: Authentication.withToken(
+          '${token}',
         ),
       ).getJSON(
         '${ApiConstant.SEARCH_REPO_LIST}?q=$name+in%3Aname+org%3Aflutter&per_page=10&page=$page',

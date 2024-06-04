@@ -286,6 +286,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.0"
+  flutter_inappwebview:
+    dependency: transitive
+    description:
+      name: flutter_inappwebview
+      sha256: d198297060d116b94048301ee6749cd2e7d03c1f2689783f52d210a6b7aba350
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.8.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -320,6 +328,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.24.0"
+  github_signin_promax:
+    dependency: "direct main"
+    description:
+      name: github_signin_promax
+      sha256: "8b27b42ead499d4c4a7b56e5c56db642803ba066798be5b71350767b413ab5f1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.8+1"
   glob:
     dependency: transitive
     description:

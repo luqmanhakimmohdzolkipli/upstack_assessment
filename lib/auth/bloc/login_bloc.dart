@@ -18,9 +18,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', event.email);
-    await prefs.setString('password', event.password);
-    emit(state.copyWith(status: LoginStatus.authenticated));
+    if (event.token.isNotEmpty) {
+      emit(state.copyWith(status: LoginStatus.authenticated));
+      await prefs.setString('token', event.token);
+      await prefs.setBool('authenticated', true);
+    }
     if (state.status == LoginStatus.authenticated) {
       Navigator.push(
         event.context,
